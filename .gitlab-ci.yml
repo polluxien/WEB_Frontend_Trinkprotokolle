@@ -3,7 +3,7 @@
 # Coverage see:
 # https://gist.github.com/rishitells/3c4536131819cff4eba2c8ab5bbb4570
 
-image: node:18
+image: node:20
 
 stages:
   - test

@@ -1,3 +1,5 @@
+// istanbul ignore file
+
 import { ValidationError } from "../../backend/fetchWithErrorHandling";
 import { eintraege, protokolle } from "../../backend/testdata";
 

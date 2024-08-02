@@ -77,6 +77,97 @@ export async function getProtokoll(
   }
 }
 
+export async function deleteProtokoll(
+  protokollId: string
+){
+  if (process.env.REACT_APP_REAL_FETCH !== "true") {
+    await new Promise((r) => setTimeout(r, 700));
+    const protokoll = protokolle.find((proto) => proto.id === protokollId);
+    if (!protokoll) {
+      throw new Error(
+        "Protokoll mit entsprechender Id konnte nicht gefunden werden"
+      );
+    }
+    return Promise.resolve(protokoll);
+  } else {
+    const response = await fetchWithErrorHandling(
+      `${process.env.REACT_APP_API_SERVER_URL}/api/protokoll/${protokollId}`,
+      { method: "DELETE", credentials: "include" as RequestCredentials }
+    );
+    if (response.status == 404) {
+      throw new Error("Error 404");
+    }
+    if (!response.ok) {
+      throw new Error("kein Zugriff auf das Protokoll :/");
+    }
+    return;
+  }
+}
+
+export async function updateProtokoll(
+  protoResource: ProtokollResource,
+  protokollId: string
+): Promise<ProtokollResource> {
+  if (process.env.REACT_APP_REAL_FETCH !== "true") {
+    await new Promise((r) => setTimeout(r, 700));
+    const protokoll = protokolle.find((proto) => proto.id === protokollId);
+    if (!protokoll) {
+      throw new Error(
+        "Protokoll mit entsprechender Id konnte nicht gefunden werden"
+      );
+    }
+    return Promise.resolve(protokoll);
+  } else {
+    const response = await fetchWithErrorHandling(
+      `${process.env.REACT_APP_API_SERVER_URL}/api/protokoll/${protokollId}`,
+      {
+        method: "PUT",
+        credentials: "include" as RequestCredentials,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(protoResource),
+      }
+    );
+    if (response.status == 404) {
+      throw new Error("Error 404");
+    }
+    if (!response.ok) {
+      throw new Error("kein Zugriff auf das Protokoll :/");
+    }
+    console.log("Erfolgreich Proto upgedated");
+    return response.json();
+  }
+}
+
+export async function createProtokoll(
+  protoResource: ProtokollResource
+){
+  if (process.env.REACT_APP_REAL_FETCH !== "true") {
+   //funktioniert nicht ohne backend
+  } else {
+    const response = await fetchWithErrorHandling(
+      `${process.env.REACT_APP_API_SERVER_URL}/api/protokoll/`,
+      {
+        method: "POST",
+        credentials: "include" as RequestCredentials,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(protoResource),
+      }
+    );
+    if (response.status == 404) {
+      throw new Error("Error 404");
+    }
+    if (!response.ok) {
+      throw new Error("kein Zugriff");
+    }
+    console.log("Erfolgreich Proto erstellt");
+    return;
+  }
+}
+
 export async function getEintrag(eintragId: string): Promise<EintragResource> {
   if (process.env.REACT_APP_REAL_FETCH !== "true") {
     await new Promise((r) => setTimeout(r, 700));
@@ -97,6 +188,33 @@ export async function getEintrag(eintragId: string): Promise<EintragResource> {
     }
     if (!response.ok) {
       throw new Error("Kein ZUgriff auf das Protokoll :/");
+    }
+    return response.json();
+  }
+}
+
+export async function deleteEintrag(
+  eintragID: string
+): Promise<ProtokollResource> {
+  if (process.env.REACT_APP_REAL_FETCH !== "true") {
+    await new Promise((r) => setTimeout(r, 700));
+    const protokoll = protokolle.find((proto) => proto.id === eintragID);
+    if (!protokoll) {
+      throw new Error(
+        "Protokoll mit entsprechender Id konnte nicht gefunden werden"
+      );
+    }
+    return Promise.resolve(protokoll);
+  } else {
+    const response = await fetchWithErrorHandling(
+      `${process.env.REACT_APP_API_SERVER_URL}/api/eintrag/${eintragID}`,
+      { method: "DELETE", credentials: "include" as RequestCredentials }
+    );
+    if (response.status == 404) {
+      throw new Error("Error 404");
+    }
+    if (!response.ok) {
+      throw new Error("kein Zugriff auf den Eintrag :/");
     }
     return response.json();
   }

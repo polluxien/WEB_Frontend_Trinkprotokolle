@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import Badge from "react-bootstrap/Badge";
 import Card from "react-bootstrap/Card";
 import Spinner from "react-bootstrap/Spinner";
+import Button from "react-bootstrap/Button";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import { getAlleProtokolle, getLogin } from "../backend/api";
@@ -50,9 +51,24 @@ export default function PageIndex() {
 
   return (
     <div className="container mt-4">
-      <h1>
-        Alle Protokolle <Badge bg="secondary">{protokolle.length}</Badge>
-      </h1>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h1>
+          Alle Protokolle <Badge bg="secondary">{protokolle.length}</Badge>
+        </h1>
+        <div className="ml-auto">
+          {loginInfo ? (
+            <Link to={`/protokoll/neu`}>
+              <Button variant="secondary" size="lg">
+                Neues Protokoll
+              </Button>
+            </Link>
+          ) : (
+            <Button variant="secondary" size="lg" disabled>
+              Neues Protokoll
+            </Button>
+          )}
+        </div>
+      </div>
       <div className="row">
         {protokolle.map((protokoll) => (
           <div key={protokoll.id} className="col-12 mb-3">

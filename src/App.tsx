@@ -12,6 +12,7 @@ import { ErrorFallback } from "./components/ErrorFallback";
 import { ErrorBoundary } from "react-error-boundary";
 import { LoginContext } from "./backend/LoginInfo";
 import { LoginResource } from "./Resources";
+import PageNewProtokoll from "./components/PageNewProtokoll";
 
 function App() {
   const [loginInfo, setLoginInfo] = useState<LoginResource | false | undefined>(
@@ -35,8 +36,10 @@ function App() {
             <Route path="/" element={<PageIndex />} />
             <Route path="/protokoll/:protokollId" element={<PageProtokoll />} />
             <Route path="/eintrag/:eintragId" element={<PageEintrag />} />
+           
             {loginInfo && (
               <>
+               <Route path="/protokoll/neu" element={<PageNewProtokoll />} />
                 <Route path="/admin" element={<PageAdmin />} />
                 <Route path="/prefs" element={<PagePrefs />} />
               </>

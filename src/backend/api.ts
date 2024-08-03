@@ -195,7 +195,7 @@ export async function getEintrag(eintragId: string): Promise<EintragResource> {
 
 export async function deleteEintrag(
   eintragID: string
-): Promise<ProtokollResource> {
+){
   if (process.env.REACT_APP_REAL_FETCH !== "true") {
     await new Promise((r) => setTimeout(r, 700));
     const protokoll = protokolle.find((proto) => proto.id === eintragID);
@@ -216,6 +216,42 @@ export async function deleteEintrag(
     if (!response.ok) {
       throw new Error("kein Zugriff auf den Eintrag :/");
     }
+    return;
+  }
+}
+
+export async function updateEintrag(
+  eintragResource: EintragResource,
+  eintragID: string
+): Promise<ProtokollResource> {
+  if (process.env.REACT_APP_REAL_FETCH !== "true") {
+    await new Promise((r) => setTimeout(r, 700));
+    const protokoll = protokolle.find((proto) => proto.id === eintragID);
+    if (!protokoll) {
+      throw new Error(
+        "Eintrag mit entsprechender Id konnte nicht gefunden werden"
+      );
+    }
+    return Promise.resolve(protokoll);
+  } else {
+    const response = await fetchWithErrorHandling(
+      `${process.env.REACT_APP_API_SERVER_URL}/api/eintrag/${eintragID}`,
+      {
+        method: "PUT",
+        credentials: "include" as RequestCredentials,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(eintragID),
+      }
+    );
+    if (response.status == 404) {
+      throw new Error("Error 404");
+    }
+    if (!response.ok) {
+      throw new Error("kein Zugriff auf den Eintrag :/");
+    }
+    console.log("Erfolgreich Eintrag upgedated");
     return response.json();
   }
 }

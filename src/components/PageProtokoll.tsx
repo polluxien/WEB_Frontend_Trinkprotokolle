@@ -140,13 +140,15 @@ export default function PageProtokoll() {
             )}
             <hr></hr>
             <div className="d-flex justify-content-between align-items-center mb-3">
-              <h3>Einträge <Badge bg="secondary">{eintraege.length}</Badge></h3>
+              <h3>
+                Einträge <Badge bg="secondary">{eintraege.length}</Badge>
+              </h3>
               <div className="ml-auto">
                 {loginInfo ? (
-                  <Link to={`/protokoll/neu`}>
-                    <Button variant="secondary">
-                      Neuer Eintrag
-                    </Button>
+                  <Link
+                    to={`/protokoll/${protoID}/eintrag/neu`}
+                  >
+                    <Button variant="secondary">Neuer Eintrag</Button>
                   </Link>
                 ) : (
                   <Button variant="secondary" disabled>
@@ -176,9 +178,11 @@ export default function PageProtokoll() {
                       <td>{eintrag.createdAt}</td>
                       <td>{eintrag.kommentar ? eintrag.kommentar : ""}</td>
                       <td>
+                        {loginInfo && loginInfo.id === protokoll!.ersteller ?
                         <Link to={`/eintrag/${eintrag.id}`}>
-                          Eintrag bearbeiten
+                          Details
                         </Link>
+                         : "nicht eingeloggt"}
                       </td>
                     </tr>
                   ))}

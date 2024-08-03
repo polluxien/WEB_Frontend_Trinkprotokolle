@@ -9,6 +9,7 @@ interface DeleteDialogProps {
   open: boolean;
   deleteWhat: string;
   ID: string;
+  IDübergeordnetProto?: string,
   onHide: () => void;
 }
 
@@ -16,6 +17,7 @@ export function DeleteDialog({
   open,
   onHide,
   deleteWhat,
+  IDübergeordnetProto,
   ID,
 }: DeleteDialogProps) {
   const [deleteFail, setDeleteFail] = useState("");
@@ -30,10 +32,11 @@ export function DeleteDialog({
     try {
       if (deleteWhat === "Protokoll") {
         await deleteProtokoll(ID);
+        navigate("/");
       } else {
         await deleteEintrag(ID);
+        navigate("/protokoll/" + IDübergeordnetProto);
       }
-      navigate("/");
     } catch (err: any) {
       setDeleteFail("Fehler beim Löschen: " + (err.message || "Unbekannter Fehler"));    }
   };

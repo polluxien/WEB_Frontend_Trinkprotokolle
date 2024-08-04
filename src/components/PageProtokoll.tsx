@@ -98,7 +98,7 @@ export default function PageProtokoll() {
   }
 
   return (
-    <div className="container mt-4">
+    <div key={protoID} className="container mt-4">
       {!editing ? (
         <Card>
           <Card.Header>{protokoll!.patient}</Card.Header>

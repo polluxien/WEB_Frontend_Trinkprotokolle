@@ -27,7 +27,7 @@ export default function PageEintrag() {
   // Editing Variablen
   const refGetraenk = React.useRef<HTMLInputElement>(null);
   const refMenge = React.useRef<HTMLInputElement>(null);
-  const refKommentar = React.useRef<HTMLInputElement>(null);
+  const refKommentar = React.useRef<HTMLTextAreaElement>(null);
 
   //Delete Dialog
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -52,9 +52,14 @@ export default function PageEintrag() {
     const myEintrag = {
       id: eintragID,
       getraenk: refGetraenk.current!.value,
-      menge: refMenge.current!.value,
-      kommentar: refKommentar ? refKommentar.current!.value : "",
-    } as unknown as EintragResource;
+      menge: parseInt(refMenge.current!.value, 10),
+      protokoll: eintrag!.protokoll,
+      ersteller: eintrag!.ersteller,
+    } as EintragResource;
+
+    if (refKommentar.current && refKommentar.current.value !== "") {
+      myEintrag.kommentar = refKommentar.current.value;
+    }
     await updateEintrag(myEintrag, eintragID!);
     setEditing(false);
     navigate(`/eintrag/${eintragID}`);
@@ -149,7 +154,7 @@ export default function PageEintrag() {
                   <label>
                     Menge:{" "}
                     <input
-                      type="text"
+                      type="number"
                       id="patient"
                       ref={refMenge}
                       min={1}
@@ -161,14 +166,14 @@ export default function PageEintrag() {
                 </p>
                 <p>
                   <label>
-                    Kommentar:{" "}
-                    <input
-                      type="text"
-                      id="patient"
-                      ref={refMenge}
-                      max={10000}
-                      defaultValue={eintrag?.kommentar}
-                      required
+                  Kommentar:{" "}
+                    <textarea
+                      id="kommentar"
+                      ref={refKommentar}
+                      maxLength={1000}
+                      defaultValue={eintrag?.kommentar || ""}
+                      rows={5}
+                      className="form-control"
                     />
                   </label>
                 </p>

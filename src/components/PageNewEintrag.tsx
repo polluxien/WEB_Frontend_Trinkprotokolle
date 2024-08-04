@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-import { ProtokollResource } from "../Resources";
+import { EintragResource, ProtokollResource } from "../Resources";
 
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
@@ -10,51 +10,57 @@ import Form from "react-bootstrap/Form";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useLoginContext } from "../backend/LoginInfo";
 import { CardBody } from "react-bootstrap";
-import { createProtokoll } from "../backend/api";
+import { createEintrag } from "../backend/api";
 
 export default function PageNewEintrag() {
   const navigate = useNavigate();
   const { loginInfo } = useLoginContext();
-  const [closed, setClosed] = useState<boolean | undefined>(undefined);
+  const protoID = useParams<{ protoID: string }>();
 
-  const refPatient = React.useRef<HTMLInputElement>(null);
-  const refDatum = React.useRef<HTMLInputElement>(null);
+  const refGetraenk = React.useRef<HTMLInputElement>(null);
+  const refMenge = React.useRef<HTMLInputElement>(null);
+  const refKommentar = React.useRef<HTMLTextAreaElement>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const myProtokoll = {
-      patient: refPatient.current!.value,
-      datum: refDatum.current!.value,
-      closed: closed,
-      ersteller: loginInfo ? loginInfo.id : null,
-    } as ProtokollResource;
+    if (!protoID) {
+      console.error("Fehler: protoID ist nicht definiert.");
+      return;
+    }
+    const myEintrag = {
+      getraenk: refGetraenk.current!.value,
+      menge: parseInt(refMenge.current!.value, 10),
+      protokoll: protoID,
+      ersteller: loginInfo ? loginInfo!.id : null,
+    } as EintragResource;
 
+    if (refKommentar.current && refKommentar.current.value !== "") {
+      myEintrag.kommentar = refKommentar.current.value;
+    }
+    
+    console.log("Sende Eintrag:", myEintrag);
     try {
-      await createProtokoll(myProtokoll);
-      navigate(`/`);
+      await createEintrag(myEintrag);
+      navigate(`/protokoll/${protoID}`);
     } catch (err) {
-      console.error("Fehler beim Erstellen des Protokolls:", err);
+      console.error("Fehler beim Erstellen des Eintrags:", err);
     }
   }
-
-  const handleClosedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setClosed(e.target.value === "true");
-  };
 
   return (
     <div className="container mt-4">
       <Card>
-        <Card.Header>Neues Protokoll Erstellen</Card.Header>
+        <Card.Header>Neuen Eintrag Erstellen</Card.Header>
         <CardBody>
           <form onSubmit={handleSubmit}>
             <div className="FormDemo">
               <p>
                 <label>
-                  Patient:{" "}
+                  Getränk:{" "}
                   <input
                     type="text"
                     id="patient"
-                    ref={refPatient}
+                    ref={refGetraenk}
                     minLength={3}
                     maxLength={50}
                     required
@@ -63,25 +69,28 @@ export default function PageNewEintrag() {
               </p>
               <p>
                 <label>
-                  Datum: {"  "}
-                  <input type="date" id="datum" ref={refDatum} required />
+                  Menge:{" "}
+                  <input
+                    type="number"
+                    id="patient"
+                    ref={refMenge}
+                    min={1}
+                    max={10000}
+                    required
+                  />
                 </label>
               </p>
               <p>
-                <Form.Check
-                  type="radio"
-                  label="Privat"
-                  name="closed"
-                  value="true"
-                  onChange={handleClosedChange}
-                />
-                <Form.Check
-                  type="radio"
-                  label="Öffentlich"
-                  name="closed"
-                  value="false"
-                  onChange={handleClosedChange}
-                />
+                <label>
+                  Kommentar:{" "}
+                  <textarea
+                    id="kommentar"
+                    ref={refKommentar}
+                    maxLength={1000}
+                    rows={5}
+                    className="form-control"
+                  />
+                </label>
               </p>
               <Button variant="primary" type="submit">
                 Speichern

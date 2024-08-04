@@ -77,9 +77,7 @@ export async function getProtokoll(
   }
 }
 
-export async function deleteProtokoll(
-  protokollId: string
-){
+export async function deleteProtokoll(protokollId: string) {
   if (process.env.REACT_APP_REAL_FETCH !== "true") {
     await new Promise((r) => setTimeout(r, 700));
     const protokoll = protokolle.find((proto) => proto.id === protokollId);
@@ -100,7 +98,6 @@ export async function deleteProtokoll(
     if (!response.ok) {
       throw new Error("kein Zugriff auf das Protokoll :/");
     }
-    return;
   }
 }
 
@@ -140,11 +137,9 @@ export async function updateProtokoll(
   }
 }
 
-export async function createProtokoll(
-  protoResource: ProtokollResource
-){
+export async function createProtokoll(protoResource: ProtokollResource) {
   if (process.env.REACT_APP_REAL_FETCH !== "true") {
-   //funktioniert nicht ohne backend
+    //funktioniert nicht ohne backend
   } else {
     const response = await fetchWithErrorHandling(
       `${process.env.REACT_APP_API_SERVER_URL}/api/protokoll/`,
@@ -193,9 +188,7 @@ export async function getEintrag(eintragId: string): Promise<EintragResource> {
   }
 }
 
-export async function deleteEintrag(
-  eintragID: string
-){
+export async function deleteEintrag(eintragID: string) {
   if (process.env.REACT_APP_REAL_FETCH !== "true") {
     await new Promise((r) => setTimeout(r, 700));
     const protokoll = protokolle.find((proto) => proto.id === eintragID);
@@ -223,17 +216,18 @@ export async function deleteEintrag(
 export async function updateEintrag(
   eintragResource: EintragResource,
   eintragID: string
-): Promise<ProtokollResource> {
+): Promise<EintragResource> {
   if (process.env.REACT_APP_REAL_FETCH !== "true") {
     await new Promise((r) => setTimeout(r, 700));
-    const protokoll = protokolle.find((proto) => proto.id === eintragID);
-    if (!protokoll) {
+    const eintrag = eintraege.find((ein) => ein.id === eintragID);
+    if (!eintrag) {
       throw new Error(
         "Eintrag mit entsprechender Id konnte nicht gefunden werden"
       );
     }
-    return Promise.resolve(protokoll);
+    return Promise.resolve(eintrag);
   } else {
+    console.log("Eintrag bearbeitungsmodus");
     const response = await fetchWithErrorHandling(
       `${process.env.REACT_APP_API_SERVER_URL}/api/eintrag/${eintragID}`,
       {
@@ -278,6 +272,32 @@ export async function postLogin(name: string, password: string) {
   throw new Error(
     `Error connecting to ${process.env.REACT_APP_API_SERVER_URL}: ${response.statusText}`
   );
+}
+
+export async function createEintrag(eintragResource: EintragResource) {
+  if (process.env.REACT_APP_REAL_FETCH !== "true") {
+    //funktioniert nicht ohne backend
+  } else {
+    const response = await fetchWithErrorHandling(
+      `${process.env.REACT_APP_API_SERVER_URL}/api/eintrag/`,
+      {
+        method: "POST",
+        credentials: "include" as RequestCredentials,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(eintragResource),
+      }
+    );
+    if (response.status == 404) {
+      throw new Error("Error 404");
+    }
+    if (!response.ok) {
+      throw new Error("kein Zugriff");
+    }
+    console.log("Erfolgreich Eintrag erstellt");
+    return;
+  }
 }
 
 export async function getLogin() {

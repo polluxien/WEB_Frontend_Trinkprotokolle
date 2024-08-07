@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { ProtokollResource } from "../Resources";
@@ -9,19 +9,26 @@ import Form from "react-bootstrap/Form";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useLoginContext } from "../backend/LoginInfo";
-import { CardBody } from "react-bootstrap";
 import { createProtokoll } from "../backend/api";
 
 export default function PageNewProtokoll() {
   const navigate = useNavigate();
   const { loginInfo } = useLoginContext();
   const [closed, setClosed] = useState<boolean | undefined>(undefined);
+  const [validated, setValidated] = useState(false);
 
-  const refPatient = React.useRef<HTMLInputElement>(null);
-  const refDatum = React.useRef<HTMLInputElement>(null);
+  const refPatient = useRef<HTMLInputElement>(null);
+  const refDatum = useRef<HTMLInputElement>(null);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const form = e.currentTarget;
+    if (form.checkValidity() === false || closed === undefined) {
+      e.stopPropagation();
+      setValidated(true);
+      return;
+    }
+
     const myProtokoll = {
       patient: refPatient.current!.value,
       datum: refDatum.current!.value,
@@ -45,57 +52,64 @@ export default function PageNewProtokoll() {
     <div className="container mt-4">
       <Card>
         <Card.Header>Neues Protokoll Erstellen</Card.Header>
-        <CardBody>
-          <form onSubmit={handleSubmit}>
-            <div className="FormDemo">
-              <p>
-                <label>
-                  Patient:{" "}
-                  <input
-                    type="text"
-                    id="patient"
-                    ref={refPatient}
-                    minLength={3}
-                    maxLength={50}
-                    required
-                  />
-                </label>
-              </p>
-              <p>
-                <label>
-                  Datum: {"  "}
-                  <input type="date" id="datum" ref={refDatum} required />
-                </label>
-              </p>
-              <p>
-                <Form.Check
-                  type="radio"
-                  label="Privat"
-                  name="closed"
-                  value="true"
-                  onChange={handleClosedChange}
-                />
-                <Form.Check
-                  type="radio"
-                  label="Öffentlich"
-                  name="closed"
-                  value="false"
-                  onChange={handleClosedChange}
-                />
-              </p>
-              <Button variant="primary" type="submit">
-                Speichern
-              </Button>
-              <Button
-                variant="secondary"
-                className="ms-2"
-                onClick={() => navigate(`/`)}
-              >
-                Abbrechen
-              </Button>
-            </div>
-          </form>
-        </CardBody>
+        <Card.Body>
+          <Form noValidate validated={validated} onSubmit={handleSubmit}>
+            <Form.Group className="mb-3" controlId="patient">
+              <Form.Label>Patient</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Max Mustermann"
+                minLength={3}
+                maxLength={50}
+                required
+                ref={refPatient}
+              />
+              <Form.Control.Feedback type="invalid">
+                Bitte geben Sie einen gültigen Patientennamen ein (3-50 Zeichen).
+              </Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="datum">
+              <Form.Label>Datum</Form.Label>
+              <Form.Control type="date" ref={refDatum} required />
+              <Form.Control.Feedback type="invalid">
+                Bitte geben Sie ein gültiges Datum ein.
+              </Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="closed">
+              <Form.Check
+                type="radio"
+                label="Privat"
+                name="closed"
+                value="true"
+                onChange={handleClosedChange}
+                required
+                isInvalid={closed === undefined && validated}
+              />
+              <Form.Check
+                type="radio"
+                label="Öffentlich"
+                name="closed"
+                value="false"
+                onChange={handleClosedChange}
+                required
+                isInvalid={closed === undefined && validated}
+              />
+              <Form.Control.Feedback type="invalid">
+                Bitte wählen Sie eine Option.
+              </Form.Control.Feedback>
+            </Form.Group>
+            <Button variant="primary" type="submit">
+              Speichern
+            </Button>
+            <Button
+              variant="secondary"
+              className="ms-2"
+              onClick={() => navigate(`/`)}
+            >
+              Abbrechen
+            </Button>
+          </Form>
+        </Card.Body>
       </Card>
     </div>
   );

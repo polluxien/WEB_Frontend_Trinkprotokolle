@@ -236,7 +236,7 @@ export async function updateEintrag(
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(eintragID),
+        body: JSON.stringify(eintragResource),
       }
     );
     if (response.status == 404) {
@@ -248,30 +248,6 @@ export async function updateEintrag(
     console.log("Erfolgreich Eintrag upgedated");
     return response.json();
   }
-}
-
-export async function postLogin(name: string, password: string) {
-  const url = `${process.env.REACT_APP_API_SERVER_URL}/api/login`;
-
-  const response = await fetchWithErrorHandling(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include" as RequestCredentials,
-    body: JSON.stringify({ name, password }),
-  });
-  console.log(`Response status: ${response.status}`);
-  if (response.ok) {
-    const loginInfo: LoginResource = await response.json();
-    return loginInfo;
-  }
-  if (response.status === 401) {
-    throw new Error("Invalid credentials");
-  }
-  throw new Error(
-    `Error connecting to ${process.env.REACT_APP_API_SERVER_URL}: ${response.statusText}`
-  );
 }
 
 export async function createEintrag(eintragResource: EintragResource) {
@@ -298,6 +274,30 @@ export async function createEintrag(eintragResource: EintragResource) {
     console.log("Erfolgreich Eintrag erstellt");
     return;
   }
+}
+
+export async function postLogin(name: string, password: string) {
+  const url = `${process.env.REACT_APP_API_SERVER_URL}/api/login`;
+
+  const response = await fetchWithErrorHandling(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include" as RequestCredentials,
+    body: JSON.stringify({ name, password }),
+  });
+  console.log(`Response status: ${response.status}`);
+  if (response.ok) {
+    const loginInfo: LoginResource = await response.json();
+    return loginInfo;
+  }
+  if (response.status === 401) {
+    throw new Error("Invalid credentials");
+  }
+  throw new Error(
+    `Error connecting to ${process.env.REACT_APP_API_SERVER_URL}: ${response.statusText}`
+  );
 }
 
 export async function getLogin() {

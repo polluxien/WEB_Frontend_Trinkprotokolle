@@ -5,10 +5,9 @@ import { getEintrag, updateEintrag } from "../backend/api";
 import { LoadingIndicator } from "./LoadingIndicator";
 
 import Card from "react-bootstrap/Card";
+import Form from "react-bootstrap/Form";
 import Spinner from "react-bootstrap/Spinner";
-import { CardBody, CardFooter } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useErrorBoundary } from "react-error-boundary";
 import { useLoginContext } from "../backend/LoginInfo";
 import Button from "react-bootstrap/Button";
 import { DeleteDialog } from "./DeleteDialog";
@@ -28,6 +27,7 @@ export default function PageEintrag() {
   const refGetraenk = React.useRef<HTMLInputElement>(null);
   const refMenge = React.useRef<HTMLInputElement>(null);
   const refKommentar = React.useRef<HTMLTextAreaElement>(null);
+  const [validated, setValidated] = useState(false);
 
   //Delete Dialog
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -63,6 +63,7 @@ export default function PageEintrag() {
     await updateEintrag(myEintrag, eintragID!);
     setEditing(false);
     navigate(`/eintrag/${eintragID}`);
+    navigate(0);
   }
 
   if (loading) {
@@ -133,63 +134,68 @@ export default function PageEintrag() {
       ) : (
         <Card>
           <Card.Header>Bestehenden Eintrag Bearbeiten</Card.Header>
-          <CardBody>
-            <form onSubmit={handleSubmit}>
-              <div className="FormDemo">
-                <p>
-                  <label>
-                    Getränk:{" "}
-                    <input
-                      type="text"
-                      id="patient"
-                      ref={refGetraenk}
-                      minLength={3}
-                      maxLength={50}
-                      defaultValue={eintrag!.getraenk}
-                      required
-                    />
-                  </label>
-                </p>
-                <p>
-                  <label>
-                    Menge:{" "}
-                    <input
-                      type="number"
-                      id="patient"
-                      ref={refMenge}
-                      min={1}
-                      max={10000}
-                      defaultValue={eintrag!.menge}
-                      required
-                    />
-                  </label>
-                </p>
-                <p>
-                  <label>
-                  Kommentar:{" "}
-                    <textarea
-                      id="kommentar"
-                      ref={refKommentar}
-                      maxLength={1000}
-                      defaultValue={eintrag?.kommentar || ""}
-                      rows={5}
-                      className="form-control"
-                    />
-                  </label>
-                </p>
-                <Button variant="primary" type="submit">
-                  Speichern
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="ms-2"
-                  onClick={() => setEditing(false)}
-                >
-                  Abbrechen
-                </Button>
-              </div>
-            </form>
-          </CardBody>
+          <Card.Body>
+            <Form noValidate validated={validated} onSubmit={handleSubmit}>
+              <Form.Group className="mb-3" controlId="formGetränk">
+                <Form.Label>Getränk</Form.Label>
+                <Form.Control
+                  placeholder="Wasser"
+                  type="text"
+                  id="patient"
+                  ref={refGetraenk}
+                  defaultValue={eintrag!.getraenk}
+                  minLength={3}
+                  maxLength={50}
+                  required
+                />
+                <Form.Control.Feedback type="invalid">
+                  Bitte geben Sie einen gültigen Getränkenamen ein (3-50
+                  Zeichen).
+                </Form.Control.Feedback>
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="formMenge">
+                <Form.Label>Menge in ml</Form.Label>
+                <Form.Control
+                  type="number"
+                  id="patient"
+                  ref={refMenge}
+                  defaultValue={eintrag!.menge}
+                  min={1}
+                  max={10000}
+                  required
+                />
+                <Form.Control.Feedback type="invalid">
+                  Bitte geben Sie eine gültige Menge ein (1-10000 ml).
+                </Form.Control.Feedback>
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="formKommentar">
+                <Form.Label>Kommentar</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  id="kommentar"
+                  ref={refKommentar}
+                  defaultValue={eintrag?.kommentar || ""}
+                  maxLength={1000}
+                  className="form-control"
+                />
+                <Form.Control.Feedback type="invalid">
+                  Kommentar darf maximal 1000 Zeichen lang sein.
+                </Form.Control.Feedback>
+              </Form.Group>
+
+              <Button variant="primary" type="submit">
+                Speichern
+              </Button>
+              <Button
+                variant="secondary"
+                className="ms-2"
+                onClick={() => navigate(`/protokoll/${eintrag.protokoll}`)}
+              >
+                Abbrechen
+              </Button>
+            </Form>
+          </Card.Body>
         </Card>
       )}
       <DeleteDialog

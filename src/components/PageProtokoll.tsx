@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   deleteProtokoll,
@@ -25,25 +25,24 @@ export default function PageProtokoll() {
   const params = useParams();
   const navigate = useNavigate();
   const protoID = params.protokollId;
-  console.log(protoID);
   const [protokoll, setProtokoll] = useState<ProtokollResource>();
   const [eintraege, setEintraege] = useState<EintragResource[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<boolean>(false);
   const { loginInfo } = useLoginContext();
+  const [validated, setValidated] = useState(false);
 
   // Editing Variablen
-  const refPatient = React.useRef<HTMLInputElement>(null);
-  const refDatum = React.useRef<HTMLInputElement>(null);
+  const refPatient = useRef<HTMLInputElement>(null);
+  const refDatum = useRef<HTMLInputElement>(null);
   const [closed, setClosed] = useState<boolean | undefined>(undefined);
 
-  //Delete Dialog
+  // Delete Dialog
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   async function load() {
     try {
-      console.log("Fetching Protokoll ID:", protoID);
       const proto = await getProtokoll(protoID!);
       setProtokoll(proto);
       const alleEintraege = await getAlleEintraege(protoID!);
@@ -60,22 +59,35 @@ export default function PageProtokoll() {
     load();
   }, [protoID]);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const form = e.currentTarget;
+    if (form.checkValidity() === false || closed === undefined) {
+      e.stopPropagation();
+      setValidated(true);
+      return;
+    }
+
     const myProtokoll = {
       id: protoID,
       patient: refPatient.current!.value,
       datum: refDatum.current!.value,
       closed: closed !== undefined ? closed : protokoll!.closed,
     } as ProtokollResource;
-    await updateProtokoll(myProtokoll, protoID!);
-    setEditing(false);
-    navigate(`/protokoll/${protoID}`);
+
+    try {
+      await updateProtokoll(myProtokoll, protoID!);
+      setEditing(false);
+      navigate(`/protokoll/${protoID}`);
+      navigate(0);
+    } catch (err) {
+      console.error("Fehler beim Aktualisieren des Protokolls:", err);
+    }
   }
 
   const formatDate = (date: string) => {
     const d = new Date(date);
-    return d.toISOString().split("T")[0];
+    return isNaN(d.getTime()) ? "" : d.toISOString().split("T")[0];
   };
 
   const handleClosedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,7 +105,6 @@ export default function PageProtokoll() {
   }
 
   if (error) {
-    console.log("Error detected:", error);
     return <div>{error}</div>;
   }
 
@@ -125,7 +136,6 @@ export default function PageProtokoll() {
                   className="me-2"
                   onClick={() => setEditing(true)}
                 >
-                  {" "}
                   Editieren
                 </Button>
                 <Button
@@ -133,7 +143,6 @@ export default function PageProtokoll() {
                   size="sm"
                   onClick={() => setShowDeleteDialog(true)}
                 >
-                  {" "}
                   Löschen
                 </Button>
               </div>
@@ -145,9 +154,7 @@ export default function PageProtokoll() {
               </h3>
               <div className="ml-auto">
                 {loginInfo ? (
-                  <Link
-                    to={`/protokoll/${protoID}/eintrag/neu`}
-                  >
+                  <Link to={`/protokoll/${protoID}/eintrag/neu`}>
                     <Button variant="secondary">Neuer Eintrag</Button>
                   </Link>
                 ) : (
@@ -178,11 +185,11 @@ export default function PageProtokoll() {
                       <td>{eintrag.createdAt}</td>
                       <td>{eintrag.kommentar ? eintrag.kommentar : ""}</td>
                       <td>
-                        {loginInfo && loginInfo.id === protokoll!.ersteller ?
-                        <Link to={`/eintrag/${eintrag.id}`}>
-                          Details
-                        </Link>
-                         : "nicht eingeloggt"}
+                        {loginInfo && loginInfo.id === protokoll!.ersteller ? (
+                          <Link to={`/eintrag/${eintrag.id}`}>Details</Link>
+                        ) : (
+                          "nicht eingeloggt"
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -194,66 +201,73 @@ export default function PageProtokoll() {
       ) : (
         <Card>
           <Card.Header>Bestehendes Protokoll Bearbeiten</Card.Header>
-          <CardBody>
-            <form onSubmit={handleSubmit}>
-              <div className="FormDemo">
-                <p>
-                  <label>
-                    Patient:{" "}
-                    <input
-                      type="text"
-                      id="patient"
-                      ref={refPatient}
-                      minLength={3}
-                      maxLength={50}
-                      defaultValue={protokoll!.patient}
-                      required
-                    />
-                  </label>
-                </p>
-                <p>
-                  <label>
-                    Datum: {"  "}
-                    <input
-                      type="date"
-                      id="datum"
-                      ref={refDatum}
-                      defaultValue={formatDate(protokoll!.datum)}
-                      required
-                    />
-                  </label>
-                </p>
-                <p>
-                  <Form.Check
-                    type="radio"
-                    label="Privat"
-                    name="closed"
-                    value="true"
-                    checked={closed === true}
-                    onChange={handleClosedChange}
-                  />
-                  <Form.Check
-                    type="radio"
-                    label="Öffentlich"
-                    name="closed"
-                    value="false"
-                    checked={closed === false}
-                    onChange={handleClosedChange}
-                  />
-                </p>
-                <Button variant="primary" type="submit">
-                  Speichern
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="ms-2"
-                  onClick={() => setEditing(false)}
-                >
-                  Abbrechen
-                </Button>
-              </div>
-            </form>
-          </CardBody>
+          <Card.Body>
+            <Form noValidate validated={validated} onSubmit={handleSubmit}>
+              <Form.Group className="mb-3" controlId="patient">
+                <Form.Label>Patient</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Max Mustermann"
+                  minLength={3}
+                  maxLength={50}
+                  required
+                  defaultValue={protokoll!.patient}
+                  ref={refPatient}
+                />
+                <Form.Control.Feedback type="invalid">
+                  Bitte geben Sie einen gültigen Patientennamen ein (3-50
+                  Zeichen).
+                </Form.Control.Feedback>
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="datum">
+                <Form.Label>Datum</Form.Label>
+                <Form.Control
+                  type="date"
+                  ref={refDatum}
+                  required
+                  defaultValue={formatDate(protokoll!.datum)}
+                />
+                <Form.Control.Feedback type="invalid">
+                  Bitte geben Sie ein gültiges Datum ein.
+                </Form.Control.Feedback>
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="closed">
+                <Form.Check
+                  type="radio"
+                  label="Privat"
+                  name="closed"
+                  value="true"
+                  onChange={handleClosedChange}
+                  defaultChecked={protokoll!.closed === true}
+                  required
+                  isInvalid={closed === undefined && validated}
+                />
+                <Form.Check
+                  type="radio"
+                  label="Öffentlich"
+                  name="closed"
+                  value="false"
+                  onChange={handleClosedChange}
+                  defaultChecked={protokoll!.closed === false}
+                  required
+                  isInvalid={closed === undefined && validated}
+                />
+                <Form.Control.Feedback type="invalid">
+                  Bitte wählen Sie eine Option.
+                </Form.Control.Feedback>
+              </Form.Group>
+              <Button variant="primary" type="submit">
+                Speichern
+              </Button>
+              <Button
+                variant="secondary"
+                className="ms-2"
+                onClick={() => setEditing(false)}
+              >
+                Abbrechen
+              </Button>
+            </Form>
+          </Card.Body>
         </Card>
       )}
       <DeleteDialog

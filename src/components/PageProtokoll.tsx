@@ -112,7 +112,22 @@ export default function PageProtokoll() {
     <div key={protoID} className="container mt-4">
       {!editing ? (
         <Card>
-          <Card.Header>{protokoll!.patient}</Card.Header>
+          <Card.Header
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            {protokoll!.patient}{" "}
+            {!protokoll!.public && (
+              <Card.Img
+                variant="top"
+                src="src/Images/private.png"
+                style={{ height: "24px", width: "24px" }}
+              />
+            )}
+          </Card.Header>
           <Card.Body>
             <Card.Text>
               <strong>Gesammte Menge:</strong> {protokoll!.gesamtMenge}
@@ -164,38 +179,43 @@ export default function PageProtokoll() {
                 )}
               </div>
             </div>
-            <ul className="list-unstyled">
-              <Table striped bordered hover>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Getränk</th>
-                    <th>Menge</th>
-                    <th>Erstellt am</th>
-                    <th>Kommentar</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {eintraege.map((eintrag, index) => (
-                    <tr key={eintrag.id}>
-                      <td>{index + 1}</td>
-                      <td>{eintrag.getraenk}</td>
-                      <td>{eintrag.menge}</td>
-                      <td>{eintrag.createdAt}</td>
-                      <td>{eintrag.kommentar ? eintrag.kommentar : ""}</td>
-                      <td>
-                        {loginInfo && loginInfo.id === protokoll!.ersteller ? (
-                          <Link to={`/eintrag/${eintrag.id}`}>Details</Link>
-                        ) : (
-                          "nicht eingeloggt"
-                        )}
-                      </td>
+            {eintraege.length > 0 ? (
+              <ul className="list-unstyled">
+                <Table striped bordered hover>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Getränk</th>
+                      <th>Menge</th>
+                      <th>Erstellt am</th>
+                      <th>Kommentar</th>
+                      <th></th>
                     </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </ul>
+                  </thead>
+                  <tbody>
+                    {eintraege.map((eintrag, index) => (
+                      <tr key={eintrag.id}>
+                        <td>{index + 1}</td>
+                        <td>{eintrag.getraenk}</td>
+                        <td>{eintrag.menge}</td>
+                        <td>{eintrag.createdAt}</td>
+                        <td>{eintrag.kommentar ? eintrag.kommentar : ""}</td>
+                        <td>
+                          {loginInfo &&
+                          loginInfo.id === protokoll!.ersteller ? (
+                            <Link to={`/eintrag/${eintrag.id}`}>Details</Link>
+                          ) : (
+                            "nicht eingeloggt"
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </ul>
+            ) : (
+              <i>Noch keine Einträge vorhanden</i>
+            )}
           </Card.Body>
         </Card>
       ) : (

@@ -73,7 +73,22 @@ export default function PageIndex() {
         {protokolle.map((protokoll) => (
           <div key={protokoll.id} className="col-12 mb-3">
             <Card>
-              <Card.Header>{protokoll.patient}</Card.Header>
+              <Card.Header
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                {protokoll.patient}{" "}
+                {!protokoll.public && (
+                  <Card.Img
+                    variant="top"
+                    src="src/Images/auge.png"
+                    style={{ height: "24px", width: "24px" }}
+                  />
+                )}
+              </Card.Header>
               <Card.Body>
                 <Card.Text>
                   <strong>Gesammte Menge:</strong> {protokoll.gesamtMenge}

@@ -62,6 +62,7 @@ export default function PageProtokoll() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
+    
     if (form.checkValidity() === false || closed === undefined) {
       e.stopPropagation();
       setValidated(true);
@@ -72,7 +73,8 @@ export default function PageProtokoll() {
       id: protoID,
       patient: refPatient.current!.value,
       datum: refDatum.current!.value,
-      closed: closed !== undefined ? closed : protokoll!.closed,
+      closed: closed,
+      public: !closed
     } as ProtokollResource;
 
     try {
@@ -88,10 +90,6 @@ export default function PageProtokoll() {
   const formatDate = (date: string) => {
     const d = new Date(date);
     return isNaN(d.getTime()) ? "" : d.toISOString().split("T")[0];
-  };
-
-  const handleClosedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setClosed(e.target.value === "true");
   };
 
   if (loading) {
@@ -257,7 +255,7 @@ export default function PageProtokoll() {
                   label="Privat"
                   name="closed"
                   value="true"
-                  onChange={handleClosedChange}
+                  onChange={() => setClosed(true)}
                   defaultChecked={protokoll!.closed === true}
                   required
                   isInvalid={closed === undefined && validated}
@@ -267,7 +265,7 @@ export default function PageProtokoll() {
                   label="Öffentlich"
                   name="closed"
                   value="false"
-                  onChange={handleClosedChange}
+                  onChange={() => setClosed(false)}
                   defaultChecked={protokoll!.closed === false}
                   required
                   isInvalid={closed === undefined && validated}

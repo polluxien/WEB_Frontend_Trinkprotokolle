@@ -14,7 +14,7 @@ import { createProtokoll } from "../backend/api";
 export default function PageNewProtokoll() {
   const navigate = useNavigate();
   const { loginInfo } = useLoginContext();
-  const [closed, setClosed] = useState<boolean | undefined>(undefined);
+  const [closed, setClosed] = useState<boolean>();
   const [validated, setValidated] = useState(false);
 
   const refPatient = useRef<HTMLInputElement>(null);
@@ -23,6 +23,7 @@ export default function PageNewProtokoll() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
+
     if (form.checkValidity() === false || closed === undefined) {
       e.stopPropagation();
       setValidated(true);
@@ -33,6 +34,7 @@ export default function PageNewProtokoll() {
       patient: refPatient.current!.value,
       datum: refDatum.current!.value,
       closed: closed,
+      public: !closed,
       ersteller: loginInfo ? loginInfo.id : null,
     } as ProtokollResource;
 
@@ -43,10 +45,6 @@ export default function PageNewProtokoll() {
       console.error("Fehler beim Erstellen des Protokolls:", err);
     }
   }
-
-  const handleClosedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setClosed(e.target.value === "true");
-  };
 
   return (
     <div className="container mt-4">
@@ -81,7 +79,7 @@ export default function PageNewProtokoll() {
                 label="Privat"
                 name="closed"
                 value="true"
-                onChange={handleClosedChange}
+                onChange={() => setClosed(true)}
                 required
                 isInvalid={closed === undefined && validated}
               />
@@ -90,7 +88,7 @@ export default function PageNewProtokoll() {
                 label="Öffentlich"
                 name="closed"
                 value="false"
-                onChange={handleClosedChange}
+                onChange={() => setClosed(false)}
                 required
                 isInvalid={closed === undefined && validated}
               />

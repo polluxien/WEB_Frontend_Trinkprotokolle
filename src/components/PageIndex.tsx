@@ -9,6 +9,7 @@ import { getAlleProtokolle, getLogin } from "../backend/api";
 import { useEffect, useState } from "react";
 import { ProtokollResource } from "../Resources";
 import { useLoginContext } from "../backend/LoginInfo";
+import { stringToDate } from "../Helper/DateHelper"
 
 export default function PageIndex() {
   const [protokolle, setProtokolle] = useState<ProtokollResource[]>([]);
@@ -22,7 +23,14 @@ export default function PageIndex() {
 
     try {
       const alleProtokolle = await getAlleProtokolle();
-      setProtokolle(alleProtokolle!);
+
+      // Sortiere die Protokolle nach Datum, von neu nach alt
+      const sortierteProtokolle = alleProtokolle.sort((a, b) => {
+        const dateA = new Date(stringToDate(a.datum)).getTime();
+        const dateB = new Date(stringToDate(b.datum)).getTime();
+        return dateB - dateA;
+      });
+      setProtokolle(sortierteProtokolle!);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -84,7 +92,7 @@ export default function PageIndex() {
                 {!protokoll.public && (
                   <Card.Img
                     variant="top"
-                    src="src/Images/auge.png"
+                    src="private.png"
                     style={{ height: "24px", width: "24px" }}
                   />
                 )}

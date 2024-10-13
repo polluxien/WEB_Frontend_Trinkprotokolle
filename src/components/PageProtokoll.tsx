@@ -123,7 +123,7 @@ export default function PageProtokoll() {
             {!protokoll!.public && (
               <Card.Img
                 variant="top"
-                src="src/Images/private.png"
+                src="private.png"
                 style={{ height: "24px", width: "24px" }}
               />
             )}

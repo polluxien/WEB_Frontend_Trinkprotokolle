@@ -268,7 +268,7 @@ export default function PageProtokoll() {
                   onChange={() => setClosed(false)}
                   defaultChecked={protokoll!.closed === false}
                   required
-                  isInvalid={closed === undefined && validated}
+                  isInvalid={!closed === undefined && validated}
                 />
                 <Form.Control.Feedback type="invalid">
                   Bitte wählen Sie eine Option.

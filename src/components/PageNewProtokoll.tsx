@@ -81,7 +81,6 @@ export default function PageNewProtokoll() {
                 value="true"
                 onChange={() => setClosed(true)}
                 required
-                isInvalid={closed === undefined && validated}
               />
               <Form.Check
                 type="radio"
@@ -90,7 +89,6 @@ export default function PageNewProtokoll() {
                 value="false"
                 onChange={() => setClosed(false)}
                 required
-                isInvalid={closed === undefined && validated}
               />
               <Form.Control.Feedback type="invalid">
                 Bitte wählen Sie eine Option.

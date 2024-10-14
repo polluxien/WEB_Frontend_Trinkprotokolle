@@ -5,6 +5,10 @@ export type PflegerResource = {
     name: string
     admin: boolean
     password?: string
+    gender?: string;
+    birth: string;
+    adress: string;
+    position: string;
 }
 
 export type ProtokollResource = {

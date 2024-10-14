@@ -1,6 +1,7 @@
 import {
   EintragResource,
   LoginResource,
+  PflegerResource,
   ProtokollResource,
 } from "../Resources";
 import { fetchWithErrorHandling } from "./fetchWithErrorHandling";
@@ -329,4 +330,82 @@ export async function deleteLogin(): Promise<void> {
     return;
   }
   throw new Error(`Error logging out, status: ${response.status}`);
+}
+
+export async function getAllePfleger(): Promise<PflegerResource[]> {
+  const response = await fetchWithErrorHandling(
+    process.env.REACT_APP_API_SERVER_URL + "/api/pfleger/alle",
+    { credentials: "include" as RequestCredentials }
+  );
+  if (response.status == 404) {
+    throw new Error("Error 404");
+  }
+  if (!response.ok) {
+    throw new Error("kein Zugriff auf Backend");
+  }
+  return response.json();
+}
+
+export async function deletePfleger(pflegerID: string) {
+  const response = await fetchWithErrorHandling(
+    `${process.env.REACT_APP_API_SERVER_URL}/api/pfleger/${pflegerID}`,
+    { method: "DELETE", credentials: "include" as RequestCredentials }
+  );
+  if (response.status == 404) {
+    throw new Error("Error 404");
+  }
+  if (!response.ok) {
+    throw new Error("kein Zugriff auf den Pfleger :/");
+  }
+}
+
+export async function updatePfleger(
+  pflegerResource: PflegerResource,
+  pflegerID: string
+): Promise<PflegerResource> {
+  const response = await fetchWithErrorHandling(
+    `${process.env.REACT_APP_API_SERVER_URL}/api/pfleger/${pflegerID}`,
+    {
+      method: "PUT",
+      credentials: "include" as RequestCredentials,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(pflegerResource),
+    }
+  );
+  if (response.status == 404) {
+    throw new Error("Error 404");
+  }
+  if (!response.ok) {
+    throw new Error("kein Zugriff auf das Protokoll :/");
+  }
+  console.log("Erfolgreich Pfleger upgedated");
+  return response.json();
+}
+
+export async function createPfleger(pflegerResource: PflegerResource) {
+  if (process.env.REACT_APP_REAL_FETCH !== "true") {
+    //funktioniert nicht ohne backend
+  } else {
+    const response = await fetchWithErrorHandling(
+      `${process.env.REACT_APP_API_SERVER_URL}/api/pfleger/`,
+      {
+        method: "POST",
+        credentials: "include" as RequestCredentials,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(pflegerResource),
+      }
+    );
+    if (response.status == 404) {
+      throw new Error("Error 404");
+    }
+    if (!response.ok) {
+      throw new Error("kein Zugriff");
+    }
+    console.log("Erfolgreich Pfleger erstellt");
+    return;
+  }
 }

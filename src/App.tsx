@@ -43,6 +43,7 @@ function App() {
                <Route path="/protokoll/neu" element={<PageNewProtokoll />} />
                <Route path="/protokoll/:protokollId/eintrag/neu" element={<PageNewEintrag />} />
                 <Route path="/admin" element={<PageAdmin />} />
+                <Route path="/pfleger/neu" element={<PageNewPfleger />} />
                 <Route path="/prefs" element={<PagePrefs />} />
               </>
             )}

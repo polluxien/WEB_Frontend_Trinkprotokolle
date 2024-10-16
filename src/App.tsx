@@ -14,6 +14,7 @@ import { LoginContext } from "./backend/LoginInfo";
 import { LoginResource } from "./Resources";
 import PageNewProtokoll from "./components/PageNewProtokoll";
 import PageNewEintrag from "./components/PageNewEintrag";
+import PageNewPfleger from "./components/PageNewPfleger";
 
 function App() {
   const [loginInfo, setLoginInfo] = useState<LoginResource | false | undefined>(
@@ -37,11 +38,13 @@ function App() {
             <Route path="/" element={<PageIndex />} />
             <Route path="/protokoll/:protokollId" element={<PageProtokoll />} />
             <Route path="/eintrag/:eintragId" element={<PageEintrag />} />
-           
             {loginInfo && (
               <>
-               <Route path="/protokoll/neu" element={<PageNewProtokoll />} />
-               <Route path="/protokoll/:protokollId/eintrag/neu" element={<PageNewEintrag />} />
+                <Route path="/protokoll/neu" element={<PageNewProtokoll />} />
+                <Route
+                  path="/protokoll/:protokollId/eintrag/neu"
+                  element={<PageNewEintrag />}
+                />
                 <Route path="/admin" element={<PageAdmin />} />
                 <Route path="/pfleger/neu" element={<PageNewPfleger />} />
                 <Route path="/prefs" element={<PagePrefs />} />

@@ -63,7 +63,8 @@ export default function PageNewProtokoll() {
                 ref={refPatient}
               />
               <Form.Control.Feedback type="invalid">
-                Bitte geben Sie einen gültigen Patientennamen ein (3-50 Zeichen).
+                Bitte geben Sie einen gültigen Patientennamen ein (3-50
+                Zeichen).
               </Form.Control.Feedback>
             </Form.Group>
             <Form.Group className="mb-3" controlId="datum">

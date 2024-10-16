@@ -104,7 +104,7 @@ export default function PageNewEintrag() {
                 Kommentar darf maximal 1000 Zeichen lang sein.
               </Form.Control.Feedback>
             </Form.Group>
-
+            
             <Button variant="primary" type="submit">
               Speichern
             </Button>

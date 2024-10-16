@@ -89,7 +89,7 @@ export default function PageProtokoll() {
 
   const formatDate = (date: string) => {
     const d = new Date(date);
-    return isNaN(d.getTime()) ? "" : d.toISOString().split("T")[0];
+    return isNaN(d.getTime()) ? "" : d.toLocaleDateString("en-CA");
   };
 
   if (loading) {

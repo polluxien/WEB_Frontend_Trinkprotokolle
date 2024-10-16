@@ -36,7 +36,7 @@ export default function PageAdmin() {
   // Editing Variablen
   const refName = useRef<HTMLInputElement>(null);
   const [admin, setAdmin] = useState<boolean>(false);
-  const [gender, setGender] = useState<Gender>(Gender.KeineAngabe); // Verwende das Gender-Enum
+  const [gender, setGender] = useState<Gender | "">(Gender.KeineAngabe || "");
   const refBirth = useRef<HTMLInputElement>(null);
   const refAdress = useRef<HTMLInputElement>(null);
   const refPosition = useRef<HTMLInputElement>(null);
@@ -69,8 +69,8 @@ export default function PageAdmin() {
     const myPfleger: PflegerResource = {
       id: bearbeitterPflegerID!,
       name: refName.current!.value,
-      admin,
-      gender,
+      admin: admin,
+      gender: gender,
       birth: refBirth.current!.value,
       adress: refAdress.current!.value,
       position: refPosition.current!.value,
@@ -88,7 +88,7 @@ export default function PageAdmin() {
 
   const formatDate = (date: string) => {
     const d = new Date(date);
-    return isNaN(d.getTime()) ? "" : d.toISOString().split("T")[0];
+    return isNaN(d.getTime()) ? "" : d.toLocaleDateString("en-CA");
   };
 
   if (loading) {
@@ -113,9 +113,9 @@ export default function PageAdmin() {
           Pfleger verwalten <Badge bg="secondary">{pfleger.length}</Badge>
         </h1>
         <div className="ml-auto">
-          <Link to={`/protokoll/neu`}>
+          <Link to={`/pfleger/neu`}>
             <Button variant="secondary" size="lg">
-              Neues Protokoll
+              Neuen Pfleger
             </Button>
           </Link>
         </div>
@@ -147,10 +147,10 @@ export default function PageAdmin() {
                   </p>
                   <p>
                     <strong>Geburtsdatum: </strong>
-                    {formatDate(pfle.birth)}
+                    {pfle.birth}
                   </p>
                   <p>
-                    <strong>Adresse:</strong>
+                    <strong>Adresse: </strong>
                     {pfle.adress}
                   </p>
                   <hr></hr>
@@ -167,7 +167,15 @@ export default function PageAdmin() {
                         size="sm"
                         className="me-2"
                         onClick={() => {
+                          setGender(
+                            Object.values(Gender).includes(
+                              pfle.gender as Gender
+                            ) 
+                              ? (pfle.gender as Gender) 
+                              : Gender.KeineAngabe 
+                          );
                           setbearbeitterPflegerID(pfle.id);
+                          setAdmin(pfle.admin);
                           setEditing(true);
                         }}
                       >
@@ -213,7 +221,6 @@ export default function PageAdmin() {
                       <Form.Label>Geschlecht</Form.Label>
                       <Form.Select
                         value={gender}
-                        defaultValue={pfle.gender}
                         onChange={(e) => setGender(e.target.value as Gender)}
                       >
                         {Object.values(Gender).map((genderOption) => (

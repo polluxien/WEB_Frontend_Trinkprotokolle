@@ -11,6 +11,7 @@ import { PflegerResource } from "../Resources";
 import { useLoginContext } from "../backend/LoginInfo";
 import { getAllePfleger, updatePfleger } from "../backend/api";
 import { dateToString, stringToDate } from "../Helper/DateHelper";
+import { DeleteDialog } from "./DeleteDialog";
 
 enum Gender {
   KeineAngabe = "Keine Angabe",
@@ -175,7 +176,10 @@ export default function PageAdmin() {
                       <Button
                         variant="danger"
                         size="sm"
-                        onClick={() => setShowDeleteDialog(true)}
+                        onClick={() => {
+                          setbearbeitterPflegerID(pfle.id);
+                          setShowDeleteDialog(true);
+                        }}
                       >
                         Löschen
                       </Button>
@@ -269,7 +273,9 @@ export default function PageAdmin() {
                         onChange={(e) => setAdmin(e.target.checked)}
                       />
                     </Form.Group>
-                    <Button variant="primary" type="submit">Speichern</Button>
+                    <Button variant="primary" type="submit">
+                      Speichern
+                    </Button>
                     <Button
                       variant="secondary"
                       className="ms-2"
@@ -284,6 +290,12 @@ export default function PageAdmin() {
           </div>
         ))}
       </Accordion>
+      <DeleteDialog
+        open={showDeleteDialog}
+        deleteWhat="Pfleger"
+        ID={bearbeitterPflegerID!}
+        onHide={() => setShowDeleteDialog(false)}
+      />
     </div>
   );
 }

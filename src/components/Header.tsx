@@ -33,20 +33,18 @@ export default function Header() {
           Trinkprotokolle
         </Navbar.Brand>
         <Nav className="Meine-Nav-Bar">
-          <LinkContainer to="/">
-            <Nav.Link>Übersicht</Nav.Link>
-          </LinkContainer>
           {loginInfo && loginInfo.role === "a" && (
             <LinkContainer to="/admin">
               <Nav.Link>Admin</Nav.Link>
             </LinkContainer>
           )}
 
-          {loginInfo && (
+          {/*           {loginInfo && (
             <LinkContainer to="/prefs">
               <Nav.Link>Preferences</Nav.Link>
             </LinkContainer>
-          )}
+          )} 
+           */}
           {loginInfo ? (
             <Button variant="outline-warning" onClick={() => doLogout()}>
               Logout
